@@ -37,25 +37,12 @@
         border
         style="width: 100%">
         <el-table-column
-          label="编号">
-          <template slot-scope="scope">
-            <span>{{ scope.row.userId }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="日期">
-          <template slot-scope="scope">
-            <i class="el-icon-time hidden-sm-and-down"></i>
-            <span>{{ scope.row.userDate }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
           label="姓名">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="right">
               <p>姓名: {{ scope.row.userName }}</p>
-              <p>住址: {{ scope.row.userAddress }}</p>
-              <p>日期：{{ scope.row.userDate }}</p>
+              <p>住址: {{ scope.row.companyName }}</p>
+              <p>日期：{{ scope.row.phone }}</p>
               <div slot="reference" class="name-wrapper">
                 <el-button type="text">{{ scope.row.userName }}</el-button>
               </div>
@@ -63,9 +50,15 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="住址">
+          label="手机号">
           <template slot-scope="scope">
-            <span>{{ scope.row.userAddress }}</span>
+            <span>{{ scope.row.phone }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="公司地址">
+          <template slot-scope="scope">
+            <span>{{ scope.row.companyName }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -96,14 +89,14 @@
           width="80%"
           :before-close="handleClose">
           <el-input type="hidden" v-model="ruleForm.userId"/>
-          <el-form-item label="时间" prop="userDate">
-            <el-date-picker type="datetime" placeholder="选择日期" v-model="ruleForm.userDate" style="width: 100%;"></el-date-picker>
-          </el-form-item>
           <el-form-item label="姓名" prop="userName">
             <el-input v-model="ruleForm.userName"></el-input>
           </el-form-item>
-          <el-form-item label="住址" prop="userAddress">
-            <el-input v-model="ruleForm.userAddress"></el-input>
+          <el-form-item label="公司名称" prop="companyName">
+            <el-input v-model="ruleForm.companyName"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="phone">
+            <el-input v-model="ruleForm.phone"></el-input>
           </el-form-item>
 
           <span slot="footer" class="dialog-footer">
@@ -121,14 +114,14 @@
         width="80%"
         :before-close="handleClose">
         <el-input type="hidden" v-model="ruleForm.userId"/>
-        <el-form-item label="时间" prop="userDate">
-          <el-date-picker type="datetime" placeholder="选择日期" v-model="ruleForm.userDate" style="width: 100%;"></el-date-picker>
-        </el-form-item>
         <el-form-item label="姓名" prop="userName">
           <el-input v-model="ruleForm.userName"></el-input>
         </el-form-item>
-        <el-form-item label="住址" prop="userAddress">
-          <el-input v-model="ruleForm.userAddress"></el-input>
+        <el-form-item label="公司名称" prop="companyName">
+          <el-input v-model="ruleForm.companyName"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="ruleForm.phone"></el-input>
         </el-form-item>
 
         <span slot="footer" class="dialog-footer">
@@ -160,18 +153,23 @@
                 ruleForm: {
                     userId: '',
                     userName: '',
-                    userDate: '',
-                    userAddress: ''
+                    companyName: '',
+                    phone: ''
                 },
                 rules: {
                     userName: [
                         { required: true, message: '请输入姓名', trigger: 'blur' },
                         { min: 2, max: 7, message: '长度在 2 到 7 个字符', trigger: 'blur' }
                     ],
-                    userAddress: [
+                    companyName: [
                         { required: true, message: '请输入住址', trigger: 'blur' },
                         { min: 5, message: '长度大于 5 个字符', trigger: 'blur' }
                     ],
+                    phone: [
+                      { required: true, message: '请输入手机号', trigger: 'blur' },
+                      { min: 5, message: '长度大于 10个字符', trigger: 'blur' }
+                    ],
+
                 },
                 tableData: [],
                 search: '',
@@ -240,15 +238,16 @@
             handleCurrentChange() {
                 console.log(`当前页: ${this.currentPage}`);
                 let postData = this.qs.stringify({
-                    page: this.currentPage
+                    pageIndex: this.currentPage,
+                    pageSize: this.pageSize
                 });
                 this.axios({
                     method: 'post',
-                    url:'/page',
+                    url:'/listUser',
                     data:postData
                 }).then(response =>
                 {
-                    this.tableData = response.data;
+                    this.tableData = response.data.data;
                 }).catch(error =>
                 {
                     console.log(error);
@@ -262,15 +261,15 @@
             emptyUserData(){
                 this.ruleForm = {
                     userName: '',
-                    userDate: '',
-                    userAddress: ''
+                    phone: '',
+                    companyName: ''
                 }
             },
             addUser() {
                 let postData = this.qs.stringify({
-                    userDate: this.ruleForm.userDate,
+                    phone: this.ruleForm.phone,
                     userName: this.ruleForm.userName,
-                    userAddress: this.ruleForm.userAddress
+                    companyName: this.ruleForm.companyName
                 });
                 this.axios({
                     method: 'post',
@@ -301,9 +300,9 @@
             updateUser() {
                 let postData = this.qs.stringify({
                     userId: this.ruleForm.userId,
-                    userDate: this.ruleForm.userDate,
+                    phone: this.ruleForm.phone,
                     userName: this.ruleForm.userName,
-                    userAddress: this.ruleForm.userAddress
+                    companyName: this.ruleForm.companyName
                 });
                 this.axios({
                     method: 'post',
@@ -329,56 +328,41 @@
             },
             onSearch() {
                 let postData = this.qs.stringify({
-                    userName: this.search
+                    userName: this.search,
+                    pageIndex: this.currentPage,
+                    pageSize: this.pageSize
                 });
                 this.axios({
                     method: 'post',
-                    url: '/ListByName',
+                    url: '/listUser',
                     data: postData
                 }).then(response =>
                 {
-                    this.tableData = response.data;
+                    this.tableData = response.data.data;
+                    this.total= response.data.total;
                     this.disablePage = true;
                 }).catch(error =>
                 {
                     console.log(error);
                 });
             },
-            getPages() {
-                this.axios.post('/rows').then(response =>
-                {
-                    this.total = response.data;
-                }).catch(error =>
-                {
-                    console.log(error);
-                });
-            },
+
             refreshData() {
                 location.reload();
             }
         },
         created() {
-            /*this.axios.get('static/user.json').then(response =>
+
+            this.axios.post('/listUser').then(response =>
             {
-                this.tableData = response.data.tableData;
-                this.total = response.data.tableData.length;
-                // console.log(JSON.parse(JSON.stringify(response.data))['tableData'])
-            });*/
-            this.axios.post('/page').then(response =>
-            {
-                this.tableData = response.data;
+                this.tableData = response.data.data;
+                debugger
+                this.total= response.data.total;
             }).catch(error =>
             {
                 console.log(error);
             });
 
-            this.axios.post('/rows').then(response =>
-            {
-                this.total = response.data;
-            }).catch(error =>
-            {
-                console.log(error);
-            });
 
         },
     }
