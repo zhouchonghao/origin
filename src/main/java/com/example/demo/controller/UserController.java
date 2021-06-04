@@ -24,6 +24,7 @@ public class UserController {
     @ResponseBody
     public ResponseData update(User user) {
         return userService.update(user);
+
     }
 
     @RequestMapping(value = "/insert", method = RequestMethod.POST)
