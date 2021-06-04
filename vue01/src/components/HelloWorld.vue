@@ -186,6 +186,7 @@
                 this.dialogUpdate = true;
                 this.ruleForm = Object.assign({}, row); //这句是关键！！！
             },
+
             handleDelete(index, row) {
                 console.log(index, row);
                 this.$confirm('删除操作, 是否继续?', '提示', {
