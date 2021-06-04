@@ -17,6 +17,7 @@ public class UserController {
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public ResponseData delete(@RequestParam String userId) {
         return userService.delete(userId);
+
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
