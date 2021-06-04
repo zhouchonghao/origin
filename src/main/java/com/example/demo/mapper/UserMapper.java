@@ -13,6 +13,7 @@ public interface UserMapper {
 
     List<User> listUser(@Param("userName") String userName);
 
+
     void insertUser(User user);
 
     void delete(@Param("userId")String userId);
