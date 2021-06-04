@@ -1,0 +1,40 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD com.example.Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.UserMapper">
+
+	<select id="listUser" resultType="com.example.demo.models.User">
+		select * from user
+		where 1=1
+		<if test="userName!= null and userName!= ''">
+			and userName like concat('%', #{userName}, '%')
+		</if>
+	</select>
+
+
+
+
+    <insert id="insertUser" parameterType="com.example.demo.models.User">
+		INSERT INTO user
+		(
+		userId,userName,phone,companyName
+		)
+		VALUES (
+		#{userId},
+		#{userName},
+		#{phone},
+		#{companyName}
+		)
+	</insert>
+
+    <delete id="delete">
+		delete from user where userId=#{userId}
+	</delete>
+
+    <update id="update" parameterType="com.example.demo.models.User">
+		update user
+			set userName=#{userName},phone=#{phone},companyName=#{companyName}
+			where userId=#{userId}
+	</update>
+</mapper>
